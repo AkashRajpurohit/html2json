@@ -1,49 +1,22 @@
-const cheerio = require('cheerio')
-const request = require('request')
-const { writeFile } = require('fs')
+const mkdirp = require('mkdirp')
 const { join } = require('path')
 
-const getData = require('./utils/getData')
+const scraper = require('./utils/scraper')
 
-const url = "http://localhost:4000"
+const baseUrl = 'http://localhost:4000'
 
-const scraper = function(url) {
-	console.log("💻💻💻 Scraping...\n")
-	console.time("⏰⏰⏰ Time taken: ")
+const dirName = baseUrl.replace(/^(https|http).\/\//i, '')
 
-	request(url, (err, response, html) => {
-		if(err) throw Error("\nUnable to scrape 😥😥. Please check the URL again or the robots.txt file for the website being scraped\n")
-		const fileName = `${response.request.originalHost}.json`
-		console.timeEnd("⏰⏰⏰ Time taken: ")
-		const $ = cheerio.load(html)
-		const htmlTag = $('html')
-		const children = htmlTag.children()
-		const data = {
-			"tag": "html",
-			"attributes": htmlTag[0].attribs,
-			"child": []
-		}
+const pathToOutputDir = join(__dirname, 'outputs', dirName)
 
-		const _data = []
-		console.log("\n🔗🔗🔗 Converting to JSON...\n")
+mkdirp(pathToOutputDir, (err, done) => {
+  if (err) throw err
+})
 
-		for(let i = 0; i < children.length; i++) {
-			_data.push(getData(children[i]))
-		}
+// Later get links from crawler
+const links = ['/page1.html', '/page2.html', '/page3.html', '/page4.html']
 
-		data.child = [..._data]
-
-		console.log("🖇️🖇️🖇️ Converted to JSON...\n")
-		console.log("📋📋📋 Writing to output file...\n")
-
-		const jsonData = JSON.stringify(data, null, 4)
-		const pathToOutput = join(__dirname, "outputs")
-
-		writeFile(`${pathToOutput}/${fileName}`, jsonData, { flag: 'w'}, (err) => {
-			if(err) throw new Error("Unable to write to file 😥😥\n")
-			console.log("🥳🥳🥳 Writing finished...\n")
-		})
-	})
-}
-
-scraper(url)
+links.forEach(link => {
+  const url = baseUrl + link
+  scraper(url, pathToOutputDir)
+})
