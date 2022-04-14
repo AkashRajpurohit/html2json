@@ -10,7 +10,7 @@
   "author": "Akash Rajpurohit <akash009.dev@gmail.com> (https://akashrajpurohit.cf/)",
   "license": "MIT",
   "dependencies": {
-    "async": "3.0.0",
+    "async": "3.2.2",
     "cheerio": "1.0.0-rc.3",
     "lodash": "4.17.13",
     "mkdirp": "0.5.1",
